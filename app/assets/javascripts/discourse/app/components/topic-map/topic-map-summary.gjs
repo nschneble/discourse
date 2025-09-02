@@ -48,7 +48,7 @@ export default class TopicMapSummary extends Component {
       this.args.topic.posts_count >= MIN_POSTS_COUNT &&
       this.args.topicDetails.participants?.length >=
         MIN_USERS_COUNT_FOR_AVATARS &&
-      !this.site.mobileView
+      this.site.desktopView
     );
   }
 
@@ -298,7 +298,10 @@ export default class TopicMapSummary extends Component {
             <ConditionalLoadingSpinner @condition={{this.loading}}>
               <PluginOutlet
                 @name="most-liked-replies"
-                @outletArgs={{lazyHash posts=this.top3LikedPosts}}
+                @outletArgs={{lazyHash
+                  posts=this.top3LikedPosts
+                  postUrl=this.postUrl
+                }}
               >
                 <ul>
                   {{#each this.top3LikedPosts as |post|}}

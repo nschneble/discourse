@@ -165,6 +165,15 @@ en:
             flag_post:
               label: "Flag post"
               description: "Flags post (either as spam or for review)"
+            notify_author_pm:
+              label: "Notify author via PM"
+              description: "Send a personal message to the post author when their post is queued and deleted"
+            notify_author_pm_user:
+              label: "PM sender"
+              description: "User who will send the PM (defaults to system)"
+            notify_author_pm_message:
+              label: "PM message"
+              description: "Optional custom message to send to the author"
             include_personal_messages:
               label: "Include personal messages"
               description: "Also scan and triage personal messages"
@@ -177,6 +186,35 @@ en:
             max_output_tokens:
               label: "Max output tokens"
               description: "When specified, sets an upper bound to the maximum number of tokens the model can generate. Respects LLM's max output tokens limit"
+        llm_tagger:
+          tag_mode:
+            manual: "Use specific tag list (configured below)"
+            discover: "Let AI discover and use any site tags"
+          fields:
+            tagger_persona:
+              label: "AI Persona"
+              description: "The AI persona to use for analyzing and tagging posts"
+            tag_mode:
+              label: "Tag Selection Mode"
+              description: "Choose how the AI selects tags"
+            available_tags:
+              label: "Available Tags"
+              description: "Tags that the AI can choose from (only used in manual mode)"
+            confidence_threshold:
+              label: "Confidence Threshold"
+              description: "Minimum confidence percentage (0-100) required to apply suggested tags"
+            max_tags_per_post:
+              label: "Maximum Tags Per Post"
+              description: "Maximum number of tags that can be applied to a single post"
+            max_post_tokens:
+              label: "Maximum Post Tokens"
+              description: "Maximum number of tokens from the post content to analyze"
+            allow_restricted_tags:
+              label: "Allow Restricted Tags"
+              description: "Allow AI to suggest and apply tags with restricted permissions or visibility."
+            max_posts_for_context:
+              label: "Maximum Posts for Context"
+              description: "Maximum number of posts from the topic to include for analysis context (default: 5)"
 
     discourse_ai:
       title: "AI"
@@ -274,7 +312,7 @@ en:
         automation_reports:
           name: "Automated reports"
           description: "Automatically creates concise overviews of activity, highlighting trends, key topics, and engagement"
-        
+
         automation_triage:
           name: "Posts triage"
           description: "Automates moderation and management of posts by using configurable automation rules"
@@ -295,10 +333,16 @@ en:
           disabled_state:
             configure: "Configure translations"
             empty_label: "Automatic translations are disabled, click below to configure"
+        stats:
+          title: "Translation statistics"
+          complete_language_detection_description: "All %{total} eligible posts have their language detected %{tooltip}"
+          incomplete_language_detection_description: "%{done} of %{total} eligible posts have their language detected %{tooltip}"
+          description_tooltip: "Eligible posts are determined by AI translation settings"
         progress_chart:
-          title: "Translation progress"
-          completed: "Completed"
-          remaining: "Remaining"
+          title: "Translation Progress"
+          data_label: "%{percentage}%"
+          tooltip_translated: "%{done} out of %{total} posts translated"
+          bar_done: "%{done} posts"
 
 
       spam:
@@ -614,9 +658,10 @@ en:
           google-gemini-2-0-flash: "Lightweight, fast, and cost-efficient with multimodal reasoning (previous generation)"
           google-gemini-2-5-flash: "Lightweight, fast, and cost-efficient with multimodal reasoning"
           google-gemini-2-0-flash-lite: "Cost efficient and low latency model"
-          open_ai-o3: "Open AI's most capable reasoning model"
+          google-gemini-2-5-flash-image-preview: "Latest image generation model with vision capabilities"
+          open_ai-o3: "OpenAI's most capable reasoning model"
           open_ai-o4-mini: "Advanced Cost-efficient reasoning model"
-          open_ai-gpt-5: "Open AI's flagship model. It is well suited for problem solving across domains"
+          open_ai-gpt-5: "OpenAI's flagship model. It is well suited for problem solving across domains"
           open_ai-gpt-5-mini: "Provides a balance between intelligence, speed, and cost that makes it an attractive model for many use cases."
           open_ai-gpt-5-nano: "Fastest, most cost-effective GPT-5 model."
           samba_nova-Meta-Llama-3-1-8B-Instruct: "Efficient lightweight multilingual model"
@@ -626,6 +671,8 @@ en:
           open_router-x-ai-grok-3-beta: "xAI's latest model"
           open_router-deepseek-deepseek-r1-0528-free: "DeepSeek's latest reasoning model"
           open_router-meta-llama-3-3-70b-instruct: "Highly capable multilingual model"
+          groq-openai-gpt-oss-120b: "State of the art open-weight model by OpenAI"
+          groq-openai-gpt-oss-20b: "Lightweigh, fast, open-weight model by OpenAI"
 
         preseeded_model_description: "Pre-configured open-source model utilizing %{model}"
 
@@ -672,6 +719,7 @@ en:
           samba_nova: "SambaNova"
           mistral: "Mistral"
           open_router: "OpenRouter"
+          groq: "Groq"
           fake: "Custom"
 
         provider_fields:
@@ -929,6 +977,14 @@ en:
         topic:
           title: "Topic summary"
           close: "Close summary panel"
+          regenerate: "Regenerate short summary"
+          regenerate_bulk: "Regenerate short summaries"
+          regenerate_success:
+            one: "Short summary regenerated successfully"
+            other: "%{count} short summaries regenerated successfully"
+          regenerate_error:
+            one: "Failed to regenerate short summary"
+            other: "Failed to regenerate %{count} short summaries"
         topic_list_layout:
           button:
             compact: "Compact"

@@ -215,7 +215,8 @@ RSpec.describe ApplicationHelper do
           Theme.create(
             name: "Dark",
             user_id: Discourse::SYSTEM_USER_ID,
-            color_scheme_id: ColorScheme.find_by(base_scheme_id: "Dark").id,
+            color_scheme_id:
+              ColorScheme.find_by(base_scheme_id: ColorScheme::NAMES_TO_ID_MAP["Dark"]).id,
           )
         helper.request.env[:resolved_theme_id] = dark_theme.id
       end
@@ -275,7 +276,8 @@ RSpec.describe ApplicationHelper do
           Theme.create(
             name: "Dark",
             user_id: Discourse::SYSTEM_USER_ID,
-            color_scheme_id: ColorScheme.find_by(base_scheme_id: "Dark").id,
+            color_scheme_id:
+              ColorScheme.find_by(base_scheme_id: ColorScheme::NAMES_TO_ID_MAP["Dark"]).id,
           )
       end
 
@@ -300,7 +302,8 @@ RSpec.describe ApplicationHelper do
           Theme.create(
             name: "Dark",
             user_id: Discourse::SYSTEM_USER_ID,
-            color_scheme_id: ColorScheme.find_by(base_scheme_id: "Dark").id,
+            color_scheme_id:
+              ColorScheme.find_by(base_scheme_id: ColorScheme::NAMES_TO_ID_MAP["Dark"]).id,
           )
         helper.request.env[:resolved_theme_id] = dark_theme.id
         SiteSetting.logo_dark = Fabricate(:upload, url: "/images/logo-dark.png")
@@ -862,7 +865,7 @@ RSpec.describe ApplicationHelper do
 
         color_stylesheets = helper.discourse_color_scheme_stylesheets
         expect(color_stylesheets).not_to include("color_definitions_flamboyant")
-        expect(color_stylesheets).to include("color_definitions_base")
+        expect(color_stylesheets).to include("color_definitions_light-default")
       end
     end
 
@@ -922,7 +925,8 @@ RSpec.describe ApplicationHelper do
         Theme.create(
           name: "Dark",
           user_id: Discourse::SYSTEM_USER_ID,
-          color_scheme_id: ColorScheme.find_by(base_scheme_id: "Dark").id,
+          color_scheme_id:
+            ColorScheme.find_by(base_scheme_id: ColorScheme::NAMES_TO_ID_MAP["Dark"]).id,
         )
       helper.request.env[:resolved_theme_id] = dark_theme.id
 
@@ -952,20 +956,12 @@ RSpec.describe ApplicationHelper do
   describe "#discourse_theme_color_meta_tags" do
     before do
       light = Fabricate(:color_scheme)
-      light.color_scheme_colors << ColorSchemeColor.new(
-        name: "header_background",
-        hex: "abcdef",
-        dark_hex: "fedcba",
-      )
+      light.color_scheme_colors << ColorSchemeColor.new(name: "header_background", hex: "abcdef")
       light.save!
       helper.request.cookies["color_scheme_id"] = light.id
 
       dark = Fabricate(:color_scheme)
-      dark.color_scheme_colors << ColorSchemeColor.new(
-        name: "header_background",
-        hex: "defabc",
-        dark_hex: "cbafed",
-      )
+      dark.color_scheme_colors << ColorSchemeColor.new(name: "header_background", hex: "defabc")
       dark.save!
       helper.request.cookies["dark_scheme_id"] = dark.id
     end
@@ -984,17 +980,6 @@ RSpec.describe ApplicationHelper do
       expect(helper.discourse_theme_color_meta_tags).to eq(<<~HTML)
         <meta name="theme-color" media="all" content="#abcdef">
       HTML
-    end
-
-    context "when use_overhauled_theme_color_palette setting is true" do
-      before { SiteSetting.use_overhauled_theme_color_palette = true }
-
-      it "renders a light and dark theme-color meta tag using the light and dark palettes of the same color scheme record" do
-        expect(helper.discourse_theme_color_meta_tags).to eq(<<~HTML)
-          <meta name="theme-color" media="(prefers-color-scheme: light)" content="#abcdef">
-          <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#fedcba">
-        HTML
-      end
     end
   end
 
@@ -1050,15 +1035,6 @@ RSpec.describe ApplicationHelper do
 
     it "returns the value set in the dark_scheme_id cookie" do
       expect(helper.dark_scheme_id).to eq(dark_scheme.id)
-    end
-
-    context "when use_overhauled_theme_color_palette is true" do
-      before { SiteSetting.use_overhauled_theme_color_palette = true }
-
-      it "returns the same value as #scheme_id" do
-        expect(helper.dark_scheme_id).to eq(helper.scheme_id)
-        expect(helper.scheme_id).to eq(light_scheme.id)
-      end
     end
   end
 

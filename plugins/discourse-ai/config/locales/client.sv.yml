@@ -58,6 +58,10 @@ sv:
         select_option: "Välj ett alternativ..."
       layout:
         table: "Tabell"
+      translations:
+        title: "Översättningar"
+        progress_chart:
+          bar_done: "%{done} inlägg"
       spam:
         short_title: "Skräppost"
         last_seven_days: "Senaste 7 dagarna"

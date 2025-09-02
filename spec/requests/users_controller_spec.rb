@@ -178,14 +178,27 @@ RSpec.describe UsersController do
     end
 
     context "when cookies contains a destination URL" do
-      it "should redirect to the URL" do
-        destination_url = "http://thisisasite.com/somepath"
-        cookies[:destination_url] = destination_url
+      context "when the destination URL has a query" do
+        it "should redirect to the URL and preserve the query" do
+          destination_url = "http://thisisasite.com/somepath?latest=1"
+          cookies[:destination_url] = destination_url
 
-        put "/u/activate-account/#{email_token.token}"
+          put "/u/activate-account/#{email_token.token}"
 
-        expect(response.status).to eq(200)
-        expect(response.parsed_body["redirect_to"]).to eq(destination_url)
+          expect(response.status).to eq(200)
+          expect(response.parsed_body["redirect_to"]).to eq(destination_url)
+        end
+      end
+      context "when destination URL doesn't have a query" do
+        it "should redirect to the URL" do
+          destination_url = "http://thisisasite.com/somepath"
+          cookies[:destination_url] = destination_url
+
+          put "/u/activate-account/#{email_token.token}"
+
+          expect(response.status).to eq(200)
+          expect(response.parsed_body["redirect_to"]).to eq(destination_url)
+        end
       end
     end
 
@@ -3635,8 +3648,19 @@ RSpec.describe UsersController do
         expect(response).to be_forbidden
       end
 
-      it "raises an error when discourse_connect_overrides_avatar is disabled" do
+      it "raises an error when discourse_connect_overrides_avatar is enabled" do
         SiteSetting.discourse_connect_overrides_avatar = true
+        put "/u/#{user1.username}/preferences/avatar/pick.json",
+            params: {
+              upload_id: upload.id,
+              type: "custom",
+            }
+
+        expect(response.status).to eq(422)
+      end
+
+      it "raises an error when auth_overrides_avatar is enabled" do
+        SiteSetting.auth_overrides_avatar = true
         put "/u/#{user1.username}/preferences/avatar/pick.json",
             params: {
               upload_id: upload.id,
